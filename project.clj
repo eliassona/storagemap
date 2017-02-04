@@ -1,4 +1,4 @@
-(defproject storagemap "0.1.0-SNAPSHOT"
+(defproject storagemap "0.2.0-SNAPSHOT"
   :description "A storage persistent map"
   :url "https://github.com/eliassona/storagemap"
   :license {:name "Eclipse Public License"

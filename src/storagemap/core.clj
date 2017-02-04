@@ -135,3 +135,7 @@
     (doseq [k withouts]
       (s-delete! storage (key-of prefix k)))))
 
+
+(defn storage-map [storage prefix serializer]
+  (StoragePersistentMap. storage (if (empty? prefix) prefix (str prefix ":")) serializer #{} {}))                   
+                   

@@ -20,7 +20,9 @@
   ([prefix k]
     (str prefix k))
   ([prefixed-key]
-   (second (clojure.string/split prefixed-key #":")))) 
+   (if-let [k (second (clojure.string/split prefixed-key #":"))]
+     k
+     prefixed-key))) 
    
 (defn entries-of 
   ([storage prefix serializer assocMap]

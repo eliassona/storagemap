@@ -50,7 +50,7 @@
 (deftype StoragePersistentMap [storage prefix serializer withouts assocMap]
   clojure.lang.IFn
   (invoke [this k]
-    (deserialize serializer (s-read storage (key-of prefix k))))
+    (.deserialize serializer (s-read storage (key-of prefix k))))
   
   (invoke [this k not_found]
     (if-let [v (.invoke this k)]
@@ -82,7 +82,8 @@
       (contains? withouts k)
       false
       :else
-      (= (count (s-keys storage (key-of prefix k))) 1)))
+      (not (nil? (get this k))) 
+      #_(= (count (s-keys storage (key-of prefix k))) 1)))
   
   (entryAt [this k] (MapEntry. k (s-read storage (key-of prefix k))))
   
@@ -97,7 +98,8 @@
         (count withouts))))
                
   
-  (cons [this [k v]] this) ;TODO
+  (cons [this [k v]] 
+    this) 
   
   (empty [this] 
     (StoragePersistentMap. storage prefix serializer (into #{} (keys this)) {}))
@@ -141,3 +143,16 @@
 (defn storage-map [storage prefix serializer]
   (StoragePersistentMap. storage (if (empty? prefix) prefix (str prefix ":")) serializer #{} {}))                   
                    
+
+(extend-type clojure.lang.IAtom 
+  IStorage
+ (s-write! [this k v] (swap! this assoc k v)) 
+ (s-read [this k] (get @this k))
+ (s-delete! [this k] (swap! this dissoc k))
+ (s-keys [this query] (into #{} (keys @this)))
+ )
+
+(deftype NopSerializer []
+  ISerializer
+  (serialize [this data] data)
+  (deserialize [this data] data))
